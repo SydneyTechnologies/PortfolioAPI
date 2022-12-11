@@ -1,0 +1,17 @@
+This project will serve as the API consumed by my portfolio website, showcasing all my major projects
+FEATURES
+1. Authentication and authorization
+2. Search by tags in projects, search by description 
+3. A show case 
+4. Each project should have an image a link to the github, a brief description a video or gif file that is loaded in while using the endpoint, tags, live link
+5. A custom admin panel where a new project can be added with all the required fields 
+6. Fields for adding new tags 
+7. Links to showcase my articles all of which should stem from on endpoint
+8. proper documentation on how each of these features should be used
+9. pagination of results
+
+
+USE CASE EXAMPLE
+The user of the endpoint is able to login using the provided credentials, with the access all articles can be viewed, all projects can be viewed, added and removed or archived. The user
+can also filter the results by tags or by word search. The results can also be paginated depending on specifications.
+
