@@ -5,12 +5,26 @@ from . models import Projects, Tags
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from . permissions import IsOwner
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView
+)
 
 # Create your views here.
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Projects.objects.all()
     serializer_class = ProjectSerializer
-    
+
+
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'tags' or self.action == 'search':
+            permission_classes = [IsAuthenticatedOrReadOnly]
+        else:
+            permission_classes = [IsOwner, IsAuthenticated]
+        return [permission() for permission in permission_classes]
+        
     # this functions is responsible for searching by tag
     # and then displaying the result of the search 
     @action(detail=False, methods=["GET"])
@@ -45,9 +59,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
-    
+
+
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
@@ -69,9 +85,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tags.objects.all()
+    # permission_classes = [IsAuthenticatedOrReadOnly]
 
     def retrieve(self, request, pk=None):
         return super().retrieve(request, pk)
     
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+

@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 # this file will contain all the serializer classes
 
+
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tags
@@ -19,17 +21,35 @@ class ProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         extra_tags = validated_data.pop("extra_tags")
         current_tags = validated_data.pop("tags")
+        # the to add list will contain all the tags that are to be added to this 
+        # specific project
+        toAdd = []
         if extra_tags:
             extra_tags = extra_tags.split(",")
+            print(extra_tags)
+            for tags in set(extra_tags):
+                # we get the tags if the exist already if not we create them
+                target = tags.replace(" ", "").capitalize()
+                tag, created = Tags.objects.get_or_create(name = target)
+                # now let us append these tags to the toAdd list
+                toAdd.append(tag)
 
+        
+
+        print(f"this is the current tags to add {current_tags} and the type {type(current_tags)}")
+        print(f"these are the extra tags {extra_tags} ")
+
+        if current_tags:
+            print(f"the list is not empty {current_tags} the length {len(current_tags)}")
+            # so add the current_tags to the list (toAdd list)
+            toAdd = toAdd + current_tags 
+        
+        # so we need to make all entires in the toAdd list unique
+        toAdd = set(toAdd)
         project = Projects.objects.create(**validated_data)
-        for tags in extra_tags:
-            if tags.capitalize() in [i.name for i in Tags.objects.all()]: 
-                tag = Tags.objects.get(name = tags.capitalize())
-            else:
-                tag = Tags.objects.create(name = tags.capitalize())
-            project.tags.add(tag)
-        project.tags.add(current_tags)
+        print("THIS IS THE FOCUS" + str(toAdd))
+        project.tags.add(*toAdd)
+
         return project
         
     def update(self, instance, validated_data):
